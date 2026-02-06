@@ -91,19 +91,21 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'rental_db',
-        'USER': 'rental_user',
-        'PASSWORD': 'radheradhe',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
-# Database Configuration
-# This reads the 'DATABASE_URL' environment variable (Used by DigitalOcean)
-db_from_env = dj_database_url.config(conn_max_age=600)
-DATABASES['default'].update(db_from_env)
+database_url = os.environ.get('DATABASE_URL')
+
+if database_url:
+    try:
+        # Only use it if it looks like a valid URL (prevents the "://" error)
+        if "://" in database_url:
+            db_from_env = dj_database_url.parse(database_url, conn_max_age=600, ssl_require=True)
+            DATABASES['default'].update(db_from_env)
+    except Exception as e:
+        print(f"Warning: DATABASE_URL detected but failed to load: {e}")
 
 # CORS SETTINGS
 CORS_ALLOW_ALL_ORIGINS = True
