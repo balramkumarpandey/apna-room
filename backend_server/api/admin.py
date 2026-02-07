@@ -9,7 +9,7 @@ class RoomImageInline(admin.TabularInline):
     extra = 1
 
 class RoomAdmin(admin.ModelAdmin):
-    list_display = ('title', 'colony_name', 'price', 'broker_name', 'broker_phone', 'landlord_name', 'landlord_phone', 'is_available')
+    list_display = ('title', 'colony_name', 'price', 'broker_name', 'broker_phone', 'landlord_name', 'landlord_phone', 'is_available', 'google_map_link', 'total_inventory' )
     search_fields = ('title', 'colony_name', 'landlord_name')
     list_filter = ('is_available', 'room_type')
     inlines = [RoomImageInline]

@@ -29,6 +29,9 @@ class Room(models.Model):
     room_type = models.CharField(max_length=50, default='1_RK', db_index=True)
     is_available = models.BooleanField(default=True)
     video = models.FileField(upload_to='room_videos/', blank=True, null=True)
+
+    google_map_link = models.URLField(blank=True, null=True, help_text="Google Maps link here")
+    total_inventory = models.IntegerField(default=1, help_text="How many sets of this room are available?")
     
     broker_name = models.CharField(max_length=100, default="Office", help_text="Name of the Broker")
     broker_phone = models.CharField(max_length=15, default="", help_text="Phone number of Broker")
