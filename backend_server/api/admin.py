@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.utils.html import format_html  # For making HTML safe
+from django.urls import reverse  # For creating links to related objects
 from .models import Room, RoomImage, LandlordInquiry, TenantInquiry, Colony
 
 admin.site.register(Colony)
@@ -17,16 +19,24 @@ class RoomAdmin(admin.ModelAdmin):
 
 # Custom Tenant Inquiry Admin
 class TenantInquiryAdmin(admin.ModelAdmin):
-    # CORRECTED FIELD NAMES HERE:
-    list_display = ('name', 'phone_number', 'get_room_name', 'get_broker_name', 'get_broker_phone')
+    # Update list_display to use the NEW link function
+    list_display = ('name', 'phone_number', 'get_room_link', 'get_broker_name', 'get_broker_phone')
     
-    # Search by the correct field names
     search_fields = ('name', 'phone_number', 'room__title', 'room__landlord_name')
 
-    # Helper function to show Room Name
-    def get_room_name(self, obj):
-        return obj.room.title
-    get_room_name.short_description = 'Interested Room'
+    # function to create the CLICKABLE Link ---
+    def get_room_link(self, obj):
+        if obj.room:
+            # This finds the URL for the "Room Edit Page" in admin
+            # "api" is your app name, "room" is the model name
+            url = reverse("admin:api_room_change", args=[obj.room.id])
+            
+            # This renders the clickable link
+            return format_html('<a href="{}">{}</a>', url, obj.room.title)
+        return "-"
+    
+    # Set the column name
+    get_room_link.short_description = 'Interested Room (Click to View)'
 
     # Helper function to show Broker Name
     def get_broker_name(self, obj):
@@ -38,7 +48,7 @@ class TenantInquiryAdmin(admin.ModelAdmin):
         return obj.room.landlord_phone
     get_broker_phone.short_description = 'Broker Phone'
 
-# Register the models with the new settings
+# Register the models
 admin.site.register(Room, RoomAdmin)
 admin.site.register(LandlordInquiry)
 admin.site.register(TenantInquiry, TenantInquiryAdmin)
