@@ -46,7 +46,7 @@ const RoomDetail = () => {
   if (!room) return <div className="text-center py-20 bg-slate-50">Room not found</div>;
 
   const tenantBadge = getTenantBadge(room.tenant_type);
-  const bookingAmount = room.price / 2;
+  const bookingAmount = room.price / 4;
 
   // --- REUSABLE COMPONENT: RENT BREAKDOWN CARD ---
   const RentBreakdown = () => (
@@ -61,11 +61,11 @@ const RoomDetail = () => {
                 <div className="mt-2 text-xs text-emerald-600 flex flex-col gap-1">
                     <div className="flex justify-between">
                         <span>Pay Now to Book:</span>
-                        <span className="font-bold">50%</span>
+                        <span className="font-bold">25%</span>
                     </div>
                     <div className="flex justify-between border-t border-emerald-200 pt-1 mt-1">
                         <span>Pay Landlord on Move-in:</span>
-                        <span className="font-bold">Remaining 50%</span>
+                        <span className="font-bold">Remaining 75%</span>
                     </div>
                 </div>
             </div>
@@ -239,7 +239,7 @@ const RoomDetail = () => {
                   onClick={() => setIsBookingOpen(true)}
                   className="w-full py-4 bg-emerald-600 text-white rounded-xl font-bold text-lg hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 group"
                 >
-                  <CreditCard size={20} className="group-hover:rotate-12 transition-transform"/> Pay 50% to Book
+                  <CreditCard size={20} className="group-hover:rotate-12 transition-transform"/> Pay 25% to Book
                 </motion.button>
                 
                 <motion.button 

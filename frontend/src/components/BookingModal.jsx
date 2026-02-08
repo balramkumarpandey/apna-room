@@ -18,8 +18,8 @@ const BookingModal = ({ isOpen, onClose, room }) => {
 
   // Math Calculations
   const totalRent = room ? room.price : 0;
-  const payNow = totalRent / 2;
-  const payLater = totalRent / 2;
+  const payNow = totalRent / 4;
+  const payLater = totalRent * 0.75;
 
   // Mobile App Deep Link
   const upiDeepLink = `upi://pay?pa=${MY_UPI_ID}&pn=${encodeURIComponent(MY_NAME)}&am=${payNow}&cu=INR`;
@@ -131,7 +131,7 @@ const BookingModal = ({ isOpen, onClose, room }) => {
                             </div>
                             
                             <div className="flex justify-between items-center font-bold text-emerald-700 bg-emerald-50 p-2 rounded-lg border border-emerald-100">
-                                <span>Pay Now to Book (50%)</span>
+                                <span>Pay Now to Book (25%)</span>
                                 <span>{formatPrice(payNow)}</span>
                             </div>
 
