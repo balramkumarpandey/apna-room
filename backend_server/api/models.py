@@ -52,6 +52,14 @@ class Room(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.colony_name})"
+    
+    def save(self, *args, **kwargs):
+        if self.total_inventory <= 0:
+            self.is_available = False
+        else:
+            self.is_available = True 
+        super().save(*args, **kwargs)
+
 
 class RoomImage(models.Model):
     room = models.ForeignKey(Room, related_name='images', on_delete=models.CASCADE)
