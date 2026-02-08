@@ -114,11 +114,23 @@ const BookingModal = ({ isOpen, onClose, room }) => {
                 </div>
               ) : (
                 <>
-                  {/* STEP 1: BREAKDOWN & PAYMENT */}
+                  {/* BREAKDOWN & PAYMENT */}
                   {step === 1 && (
                     <div className="space-y-6">
+
+                      {/* --- TRUST BADGE (Paste this here) --- */}
+                      <div className="text-center border-b border-slate-100 pb-4">
+                        <div className="inline-flex items-center gap-1.5 bg-green-50 text-green-700 px-3 py-1.5 rounded-full text-xs font-bold border border-green-200 mb-2 shadow-sm">
+                          <ShieldCheck size={14} className="fill-green-100" /> 
+                          100% Money Safe Guarantee
+                        </div>
+                        <p className="text-slate-500 text-xs px-4 leading-relaxed">
+                          Your payment is held in <strong>Escrow</strong>. The landlord does <u>not</u> get paid until you successfully move in.
+                        </p>
+                      </div>
+                      {/* ------------------------------------------------ */}
                       
-                      {/* --- NEW: RENT BREAKDOWN CARD --- */}
+                      {/* ---RENT BREAKDOWN CARD --- */}
                       <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200">
                         <h3 className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
                             <Info size={16} className="text-blue-500"/> First Month Rent Breakdown

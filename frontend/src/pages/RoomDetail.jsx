@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, ArrowLeft, PlayCircle, Phone, Users, CreditCard, Share2, ShieldCheck, Info } from 'lucide-react';
+import { MapPin, ArrowLeft, PlayCircle, Phone, Users, CreditCard, Share2, ShieldCheck, User, HelpCircle } from 'lucide-react';
 import TenantModal from '../components/TenantModal';
 import BookingModal from '../components/BookingModal';
 
@@ -32,7 +32,6 @@ const RoomDetail = () => {
     fetchRoom();
   }, [id]);
 
-  // Helper to get Badge Color & Text
   const getTenantBadge = (type) => {
     switch (type) {
       case 'BOYS': return { color: 'bg-blue-600 text-white', label: 'Boys Only' };
@@ -45,10 +44,49 @@ const RoomDetail = () => {
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>;
   if (!room) return <div className="text-center py-20 bg-slate-50">Room not found</div>;
 
+  // --- SHARE FUNCTION ---
+  const handleShare = async () => {
+    const shareData = {
+      title: room.title,
+      text: `Check out this room in ${room.colony_name} on ApnaRoom!`,
+      url: window.location.href, // Gets the current page URL
+    };
+
+    try {
+      //  Try Native Share (Mobile/Tablets)
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback for Desktop: Copy to Clipboard
+        await navigator.clipboard.writeText(window.location.href);
+        alert("Link copied to clipboard! 📋");
+      }
+    } catch (err) {
+      console.error("Error sharing:", err);
+    }
+  };
+
   const tenantBadge = getTenantBadge(room.tenant_type);
   const bookingAmount = room.price / 4;
 
-  // --- REUSABLE COMPONENT: RENT BREAKDOWN CARD ---
+  // --- REUSABLE TRUST BADGE COMPONENT ---
+  const TrustBadge = () => (
+    <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex gap-3 shadow-sm mt-4">
+      <div className="bg-white p-1.5 rounded-full border border-green-100 shadow-sm h-fit shrink-0">
+        <ShieldCheck className="text-green-600" size={18} />
+      </div>
+      <div>
+        <h4 className="text-green-800 font-bold text-xs uppercase tracking-wide mb-1">
+          100% Money Safe Guarantee
+        </h4>
+        <p className="text-green-700 text-xs leading-relaxed">
+          Your payment is held in <strong>Escrow</strong>. We only release it to the landlord <strong>after</strong> you confirm your move-in.
+        </p>
+      </div>
+    </div>
+  );
+
+  // --- RENT BREAKDOWN CARD ---
   const RentBreakdown = () => (
     <div className="bg-emerald-50/80 border border-emerald-100 rounded-xl p-4 mt-4">
         <div className="flex items-start gap-3">
@@ -58,12 +96,28 @@ const RoomDetail = () => {
                 <p className="text-xs text-emerald-700 mt-1 leading-relaxed">
                     The <strong>₹{bookingAmount.toLocaleString()}</strong> you pay now is <span className="underline">strictly part of your 1st month rent</span>.
                 </p>
-                <div className="mt-2 text-xs text-emerald-600 flex flex-col gap-1">
-                    <div className="flex justify-between">
-                        <span>Pay Now to Book:</span>
-                        <span className="font-bold">25%</span>
+                <div className="mt-3 text-xs text-emerald-600 flex flex-col gap-2">
+                    
+                    {/* --- TOOLTIP ADDED HERE --- */}
+                    <div className="flex justify-between items-center relative z-10">
+                        <span className="flex items-center gap-1.5 cursor-help group">
+                            Pay Now to Book (25%)
+                            <HelpCircle size={14} className="text-emerald-400 group-hover:text-emerald-600 transition-colors" />
+                            
+                            {/* The Tooltip Popup */}
+                            <div className="absolute bottom-full left-0 mb-2 w-48 bg-slate-800 text-white text-[10px] p-2.5 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none transform translate-y-2 group-hover:translate-y-0 z-50">
+                                <p className="leading-relaxed">
+                                    <strong>Risk-Free:</strong> If you visit and don't like the room, we will find you another one or refund your money.
+                                </p>
+                                {/* Little arrow pointing down */}
+                                <div className="absolute top-full left-4 border-4 border-transparent border-t-slate-800"></div>
+                            </div>
+                        </span>
+                        <span className="font-bold text-emerald-700">₹{bookingAmount.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between border-t border-emerald-200 pt-1 mt-1">
+                    {/* ---------------------------------- */}
+
+                    <div className="flex justify-between border-t border-emerald-200/60 pt-2">
                         <span>Pay Landlord on Move-in:</span>
                         <span className="font-bold">Remaining 75%</span>
                     </div>
@@ -76,21 +130,24 @@ const RoomDetail = () => {
   return (
     <div className="min-h-screen bg-slate-50 pb-32 lg:pb-10 font-sans selection:bg-blue-100">
       
-      {/* 1. Navbar */}
+      {/* Navbar */}
       <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-lg border-b border-gray-100 px-4 lg:px-8 h-16 flex items-center justify-between shadow-sm">
         <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-slate-600 hover:text-black font-medium transition-all hover:-translate-x-1">
           <ArrowLeft size={20} /> <span className="hidden sm:inline">Back</span>
         </button>
         <span className="font-bold text-lg truncate max-w-[200px] lg:max-w-none text-slate-800">{room.title}</span>
-        
-        <button className="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition">
+        <button 
+          onClick={handleShare}
+          className="p-2 rounded-full hover:bg-slate-100 text-blue-600 transition-colors active:scale-90"
+          title="Share this room"
+        >
             <Share2 size={20} />
         </button>
       </div>
 
       <main className="max-w-7xl mx-auto px-4 lg:px-8 py-6 lg:py-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
         
-        {/* LEFT COLUMN (Visuals) */}
+        {/* LEFT COLUMN (Visuals & Mobile Info) */}
         <div className="lg:col-span-8 space-y-6">
           
           {/* Main Image */}
@@ -132,7 +189,7 @@ const RoomDetail = () => {
             </div>
           )}
 
-          {/* --- MOBILE INFO SECTION --- */}
+          {/* --- MOBILE INFO SECTION (lg:hidden) --- */}
           <div className="lg:hidden space-y-6">
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -154,11 +211,14 @@ const RoomDetail = () => {
             <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
                 <p className="text-xs text-blue-400 font-bold uppercase tracking-wider mb-1">Total Monthly Rent</p>
                 <div className="text-3xl font-extrabold text-blue-600">
-                ₹{room.price.toLocaleString()} 
+                  ₹{room.price.toLocaleString()} 
                 </div>
                 
-                {/* INSERT RENT BREAKDOWN HERE FOR MOBILE */}
+                {/* Mobile Rent Breakdown */}
                 <RentBreakdown />
+                
+                {/* --- MOBILE TRUST BADGE PLACEMENT --- */}
+                <TrustBadge />
             </div>
           </div>
 
@@ -230,7 +290,7 @@ const RoomDetail = () => {
                   </div>
               </div>
 
-              {/* INSERT RENT BREAKDOWN HERE FOR DESKTOP */}
+              {/* Desktop Rent Breakdown */}
               <RentBreakdown />
 
               <div className="space-y-3 mt-6">
@@ -249,6 +309,10 @@ const RoomDetail = () => {
                 >
                   <Phone size={20} /> Book a Visit
                 </motion.button>
+
+                {/* --- DESKTOP TRUST BADGE PLACEMENT --- */}
+                <TrustBadge />
+                
               </div>
 
               <p className="text-center text-xs text-slate-400 mt-4">
