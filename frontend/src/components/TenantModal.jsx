@@ -30,7 +30,7 @@ I just booked a visit for: *${room.title}* in ${room.colony_name}.
 
 🔗 Room Link: ${roomLink}
 
-Please send me the location!`;
+Please let me know the next steps. Looking forward to it! 😊`;
 
       // Create and Open WhatsApp URL
       const whatsappUrl = `https://wa.me/${myNumber}?text=${encodeURIComponent(message)}`;
