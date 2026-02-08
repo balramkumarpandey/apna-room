@@ -21,7 +21,7 @@ const TenantModal = ({ isOpen, onClose, room }) => {
 
       // 2. Auto-Open WhatsApp with Room Link
       // (Added '91' for India country code to ensure the link works universally)
-      const myNumber = "9195484981"; 
+      const myNumber = "9548484981"; // ApnaRoom's WhatsApp number
       const roomLink = `https://www.apnaroom.co.in/rooms/${room.id}`;
       
       const message = `Hi ApnaRoom! 👋
