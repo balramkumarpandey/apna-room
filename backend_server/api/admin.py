@@ -24,19 +24,22 @@ class TenantInquiryAdmin(admin.ModelAdmin):
     
     search_fields = ('name', 'phone_number', 'room__title', 'room__landlord_name')
 
-    # function to create the CLICKABLE Link ---
+    # --- Link to the LIST View ---
     def get_room_link(self, obj):
         if obj.room:
-            # This finds the URL for the "Room Edit Page" in admin
-            # "api" is your app name, "room" is the model name
-            url = reverse("admin:api_room_change", args=[obj.room.id])
+            # Get the URL for the "Room List" page (changelist)
+            # Pattern: admin:<app_label>_<model_name>_changelist
+            base_url = reverse("admin:api_room_changelist")
             
-            # This renders the clickable link
+            # 2. Add a filter to show ONLY this specific room (by ID)
+            # This creates: /admin/api/room/?id__exact=5
+            url = f"{base_url}?id__exact={obj.room.id}"
+            
+            # 3. Return the clickable link
             return format_html('<a href="{}">{}</a>', url, obj.room.title)
         return "-"
     
-    # Set the column name
-    get_room_link.short_description = 'Interested Room (Click to View)'
+    get_room_link.short_description = 'Interested Room (Go to List)'
 
     # Helper function to show Broker Name
     def get_broker_name(self, obj):
