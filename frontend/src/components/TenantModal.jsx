@@ -5,44 +5,25 @@ import api from '../api';
 
 const TenantModal = ({ isOpen, onClose, room }) => {
   const [formData, setFormData] = useState({ name: '', phone_number: '' });
-  const [status, setStatus] = useState('idle');
+  const [status, setStatus] = useState('idle'); // 'idle' | 'submitting' | 'success' | 'error'
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus('submitting');
+
     try {
-      // Send data including the Room ID
+      // 1. Save to Database
+      // We must send 'room: room.id' so the backend knows which room it is
       await api.post('/api/inquire/tenant/', {
         ...formData,
         room: room.id
       });
-      setStatus('success');
-      setTimeout(() => {
-        onClose();
-        setStatus('idle');
-        setFormData({ name: '', phone_number: '' });
-      }, 3000);
-    } catch (error) {
-      console.error("Error submitting:", error);
-      setStatus('error');
-    }
-  };
 
-  // Inside TenantModal.jsx
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      // 1. Save to Database (Keep your existing API call)
-      await api.post('/api/inquire/tenant/', formData);
-
-      // Auto-Open WhatsApp with Room Link
-      const myNumber = "9548484981";
+      // 2. Auto-Open WhatsApp with Room Link
+      // (Added '91' for India country code to ensure the link works universally)
+      const myNumber = "9195484981"; 
       const roomLink = `https://www.apnaroom.co.in/rooms/${room.id}`;
       
-      // The message the TENANT sends to YOU
       const message = `Hi ApnaRoom! 👋
 I am *${formData.name}*.
 I just booked a visit for: *${room.title}* in ${room.colony_name}.
@@ -51,25 +32,24 @@ I just booked a visit for: *${room.title}* in ${room.colony_name}.
 
 Please send me the location!`;
 
-      // Create the WhatsApp URL
+      // Create and Open WhatsApp URL
       const whatsappUrl = `https://wa.me/${myNumber}?text=${encodeURIComponent(message)}`;
-      
-      // Open it instantly
       window.open(whatsappUrl, '_blank');
 
-      // Modal & Show Success
-      setSuccess(true);
+      // 3. Show Success Message
+      setStatus('success');
+      
+      // 4. Close Modal after 2 seconds
       setTimeout(() => {
         onClose();
-        setSuccess(false);
+        setStatus('idle');
         setFormData({ name: '', phone_number: '' });
       }, 2000);
 
     } catch (error) {
-      console.error("Error:", error);
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
+      console.error("Error submitting:", error);
+      setStatus('error');
+      alert("Something went wrong. Please check your connection.");
     }
   };
 
@@ -86,6 +66,7 @@ Please send me the location!`;
             initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
             className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden"
           >
+            {/* Header */}
             <div className="bg-blue-600 p-6 flex justify-between items-center text-white">
               <div>
                 <h2 className="text-xl font-bold">Book a Visit</h2>
@@ -99,7 +80,7 @@ Please send me the location!`;
                 <div className="text-center py-8 text-green-600">
                   <CheckCircle className="w-16 h-16 mx-auto mb-4" />
                   <h3 className="text-2xl font-bold">Request Sent!</h3>
-                  <p className="text-gray-500">We will call you shortly to schedule the tour.</p>
+                  <p className="text-gray-500 mt-2">Check your WhatsApp to continue.</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -126,9 +107,9 @@ Please send me the location!`;
                   <button 
                     disabled={status === 'submitting'}
                     type="submit"
-                    className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition shadow-lg shadow-blue-500/30 flex justify-center gap-2"
+                    className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition shadow-lg shadow-blue-500/30 flex justify-center gap-2 items-center"
                   >
-                    {status === 'submitting' ? 'Booking...' : <>Confirm Booking <CalendarCheck size={20} /></>}
+                    {status === 'submitting' ? 'Opening WhatsApp...' : <>Confirm Booking <CalendarCheck size={20} /></>}
                   </button>
                 </form>
               )}
