@@ -19,6 +19,12 @@ class Room(models.Model):
         ('FAMILY', 'Family Only'),
         ('ANY', 'Anyone (Boys/Girls/Family)'),
     ]
+    ROOM_TYPE_CHOICES = [
+        ('1_RK', '1 Room Set'),
+        ('2_RK', '2 Room Set'),
+        ('1_BHK', '1 BHK'),
+        ('2_BHK', '2 BHK'),
+    ]
 
     title = models.CharField(max_length=200)
     price = models.IntegerField(db_index=True)
@@ -26,7 +32,12 @@ class Room(models.Model):
     address = models.TextField()
     colony_name = models.CharField(max_length=100, db_index=True)
     
-    room_type = models.CharField(max_length=50, default='1_RK', db_index=True)
+    room_type = models.CharField(
+        max_length=50, 
+        choices=ROOM_TYPE_CHOICES, 
+        default='1_RK', 
+        db_index=True
+    )
     is_available = models.BooleanField(default=True)
     video = models.FileField(upload_to='room_videos/', blank=True, null=True)
 
