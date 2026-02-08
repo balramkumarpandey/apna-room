@@ -28,6 +28,51 @@ const TenantModal = ({ isOpen, onClose, room }) => {
     }
   };
 
+  // Inside TenantModal.jsx
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // 1. Save to Database (Keep your existing API call)
+      await api.post('/api/inquire/tenant/', formData);
+
+      // Auto-Open WhatsApp with Room Link
+      const myNumber = "9548484981";
+      const roomLink = `https://www.apnaroom.co.in/rooms/${room.id}`;
+      
+      // The message the TENANT sends to YOU
+      const message = `Hi ApnaRoom! 👋
+I am *${formData.name}*.
+I just booked a visit for: *${room.title}* in ${room.colony_name}.
+
+🔗 Room Link: ${roomLink}
+
+Please send me the location!`;
+
+      // Create the WhatsApp URL
+      const whatsappUrl = `https://wa.me/${myNumber}?text=${encodeURIComponent(message)}`;
+      
+      // Open it instantly
+      window.open(whatsappUrl, '_blank');
+
+      // Modal & Show Success
+      setSuccess(true);
+      setTimeout(() => {
+        onClose();
+        setSuccess(false);
+        setFormData({ name: '', phone_number: '' });
+      }, 2000);
+
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
