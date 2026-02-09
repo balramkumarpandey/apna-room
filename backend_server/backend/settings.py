@@ -188,8 +188,8 @@ STORAGES = {
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'dikwysxsf', 
-    'API_KEY':    '243988784537471', 
-    'API_SECRET': '4ICbcWkh27QJvRubsu1eqv9yPfU',
+    'API_KEY':    '519939542469221', 
+    'API_SECRET': 'mgL-sp7OsS8FG3XxaTLs5vX-4eY',
 }
 
 
