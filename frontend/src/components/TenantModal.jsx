@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, CalendarCheck, CheckCircle } from 'lucide-react';
+import { X, CalendarCheck, CheckCircle, MessageCircle } from 'lucide-react'; // Added MessageCircle
 import api from '../api';
 
 const TenantModal = ({ isOpen, onClose, room }) => {
@@ -13,15 +13,14 @@ const TenantModal = ({ isOpen, onClose, room }) => {
 
     try {
       // 1. Save to Database
-      // We must send 'room: room.id' so the backend knows which room it is
       await api.post('/api/inquire/tenant/', {
         ...formData,
         room: room.id
       });
 
       // 2. Auto-Open WhatsApp with Room Link
-      // (Added '91' for India country code to ensure the link works universally)
-      const myNumber = "9548484981"; // ApnaRoom's WhatsApp number
+      // Added '91' for India to ensure the link opens correctly on all devices
+      const myNumber = "9195484981"; 
       const roomLink = `https://www.apnaroom.co.in/rooms/${room.id}`;
       
       const message = `Hi ApnaRoom! 👋
@@ -30,7 +29,7 @@ I just booked a visit for: *${room.title}* in ${room.colony_name}.
 
 🔗 Room Link: ${roomLink}
 
-Please let me know the next steps. Looking forward to it! 😊`;
+Please send me the location!`;
 
       // Create and Open WhatsApp URL
       const whatsappUrl = `https://wa.me/${myNumber}?text=${encodeURIComponent(message)}`;
@@ -84,6 +83,8 @@ Please let me know the next steps. Looking forward to it! 😊`;
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
+                  
+                  {/* Name Input */}
                   <div>
                     <label className="block text-sm font-bold text-gray-700 mb-1">Your Name</label>
                     <input 
@@ -94,15 +95,26 @@ Please let me know the next steps. Looking forward to it! 😊`;
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
                     />
                   </div>
+
+                  {/* --- WHATSAPP INPUT SECTION --- */}
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">Phone Number</label>
+                    <label className="flex items-center gap-1.5 text-sm font-bold text-gray-700 mb-1">
+                      <MessageCircle size={16} className="text-green-600 fill-green-100" /> 
+                      WhatsApp Number
+                    </label>
                     <input 
-                      required type="tel" placeholder="e.g. 98765 43210"
-                      className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                      required 
+                      type="tel" 
+                      placeholder="e.g. 98765 43210"
+                      className="w-full p-3 bg-green-50/50 border border-green-200 rounded-xl focus:ring-2 focus:ring-green-500 outline-none transition-all placeholder:text-gray-400 font-medium"
                       value={formData.phone_number}
                       onChange={(e) => setFormData({...formData, phone_number: e.target.value})}
                     />
+                    <p className="text-[10px] text-gray-500 mt-1 ml-1 font-medium">
+                      * We will send the <span className="text-green-600 font-bold">Location Pin</span> here.
+                    </p>
                   </div>
+                  {/* ---------------------------------- */}
                   
                   <button 
                     disabled={status === 'submitting'}
