@@ -188,38 +188,6 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
 
-# --- DigitalOcean Spaces Configuration ---
-if 'AWS_ACCESS_KEY_ID' in os.environ:
-    # If keys are found, use Spaces
-    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-    AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
-    AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL')
-
-    AWS_S3_OBJECT_PARAMETERS = {
-        'CacheControl': 'max-age=86400',
-    }
-    
-    AWS_LOCATION = 'media'
-    AWS_DEFAULT_ACL = 'public-read'
-
-    STORAGES = {
-        "default": {
-            "BACKEND": "storages.backends.s3.S3Storage",
-            "OPTIONS": {
-                "addressing_style": "virtual",
-            },
-        },
-        "staticfiles": {
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-        },
-    }
-else:
-    # If no keys, keep using local files (Fallback)
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = BASE_DIR / 'media'
-
-
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'dikwysxsf', 
     'API_KEY':    '243988784537471', 
