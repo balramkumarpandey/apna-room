@@ -15,6 +15,9 @@ import os
 import certifi
 from dotenv import load_dotenv 
 import dj_database_url
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 # Load environment variables from the .env file
 load_dotenv()
@@ -54,6 +57,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'django_filters',
+    'cloudinary_storage',
+    'cloudinary',
 
     # Your app
     'api',
@@ -213,3 +218,13 @@ else:
     # If no keys, keep using local files (Fallback)
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
+
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dikwysxsf', 
+    'API_KEY':    '243988784537471', 
+    'API_SECRET': '4ICbcWkh27QJvRubsu1eqv9yPfU',
+}
+
+# Tell Django to use Cloudinary for all media (images)
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
