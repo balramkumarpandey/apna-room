@@ -45,7 +45,7 @@ class Room(models.Model):
     total_inventory = models.IntegerField(default=1, help_text="How many sets of this room are available?")
     
     broker_name = models.CharField(max_length=100, default="Office", help_text="Name of the Broker")
-    broker_phone = models.CharField(max_length=15, default="", help_text="Phone number of Broker")
+    broker_phone = models.CharField(max_length=15, default="", blank=True, help_text="PPhone number of Broker (Leave empty if none)")
 
     landlord_name = models.CharField(max_length=100, blank=True, null=True, help_text="Name of the Landlord")
     landlord_phone = models.CharField(max_length=20, blank=True, null=True, help_text="Phone number of the Landlord")
