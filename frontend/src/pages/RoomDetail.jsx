@@ -153,7 +153,7 @@ const RoomDetail = () => {
           
           {/* Main Image */}
           <div className="bg-white p-2 rounded-3xl shadow-xl shadow-slate-200/50">
-            <div className="bg-slate-100 w-full h-72 lg:h-[500px] rounded-2xl overflow-hidden relative flex items-center justify-center group">
+            <div className="bg-slate-100 w-full aspect-[3/4] lg:h-[600px] rounded-3xl overflow-hidden relative flex items-center justify-center group shadow-inner">
               <AnimatePresence mode='wait'>
                 {activeImage ? (
                   <motion.img 
@@ -182,7 +182,7 @@ const RoomDetail = () => {
                   whileTap={{ scale: 0.95 }}
                   key={img.id}
                   onClick={() => setActiveImage(img.image)}
-                  className={`relative flex-shrink-0 w-24 h-24 rounded-2xl overflow-hidden border-2 shadow-sm transition-all ${activeImage === img.image ? 'border-blue-600 ring-4 ring-blue-100' : 'border-white opacity-70 grayscale hover:grayscale-0'}`}
+                  className={`relative flex-shrink-0 w-20 h-28 rounded-xl overflow-hidden border-2 shadow-sm transition-all ${activeImage === img.image ? 'border-blue-600 ring-2 ring-blue-100' : 'border-white opacity-70 grayscale hover:grayscale-0'}`}
                 >
                   <img 
                     src={getOptimizedUrl(img.image, 200)} 
