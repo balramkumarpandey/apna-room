@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { MapPin, ArrowRight, Home, BadgeCheck, Users, Ban } from 'lucide-react'; // Added Ban icon
 import { useNavigate } from 'react-router-dom';
 
+import { getOptimizedUrl } from '../utils/imageHelper';
+
 const RoomCard = ({ room }) => {
   const navigate = useNavigate();
 
@@ -28,7 +30,7 @@ const RoomCard = ({ room }) => {
   };
 
   const displayImage = room.images && room.images.length > 0 
-    ? room.images[0].image 
+    ? getOptimizedUrl(room.images[0].image, 400) 
     : "https://via.placeholder.com/600x400?text=No+Image";
 
   return (

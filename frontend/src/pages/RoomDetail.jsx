@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, ArrowLeft, PlayCircle, Phone, Users, CreditCard, Share2, ShieldCheck, User, HelpCircle } from 'lucide-react';
 import TenantModal from '../components/TenantModal';
 import BookingModal from '../components/BookingModal';
+import { getOptimizedUrl } from '../utils/imageHelper';
 
 const RoomDetail = () => {
   const { id } = useParams();
@@ -161,7 +162,7 @@ const RoomDetail = () => {
                     animate={{ opacity: 1, scale: 1 }} 
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.4 }}
-                    src={activeImage} 
+                    src={getOptimizedUrl(activeImage, 1200)}
                     className="max-w-full max-h-full object-contain z-10" 
                     alt="Room View"
                   />
@@ -183,7 +184,11 @@ const RoomDetail = () => {
                   onClick={() => setActiveImage(img.image)}
                   className={`relative flex-shrink-0 w-24 h-24 rounded-2xl overflow-hidden border-2 shadow-sm transition-all ${activeImage === img.image ? 'border-blue-600 ring-4 ring-blue-100' : 'border-white opacity-70 grayscale hover:grayscale-0'}`}
                 >
-                  <img src={img.image} className="w-full h-full object-cover" alt="thumbnail" />
+                  <img 
+                    src={getOptimizedUrl(img.image, 200)} 
+                    className="w-full h-full object-cover" 
+                    alt="thumbnail" 
+                  />
                 </motion.button>
               ))}
             </div>
@@ -235,7 +240,7 @@ const RoomDetail = () => {
               </h3>
               <div className="rounded-3xl overflow-hidden shadow-xl bg-black aspect-video w-full max-w-3xl ring-4 ring-slate-100">
                 <video controls className="w-full h-full">
-                  <source src={room.video} type="video/mp4" />
+                  <source src={getOptimizedUrl(room.video, 800)} type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
               </div>
