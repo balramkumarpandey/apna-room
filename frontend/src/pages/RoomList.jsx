@@ -137,7 +137,7 @@ const RoomList = () => {
 
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 flex gap-10 relative">
         
-        {/* --- FIXED FILTER BOX (Updated to Bottom Sheet) --- */}
+        {/* --- FIXED FILTER BOX --- */}
         <aside className={`
           fixed inset-x-0 bottom-0 z-50 
           w-full h-[85vh] lg:h-auto lg:w-80 
@@ -145,7 +145,7 @@ const RoomList = () => {
           rounded-t-[2.5rem] lg:rounded-none
           shadow-[0_-10px_40px_rgba(0,0,0,0.15)] lg:shadow-none
           transform transition-transform duration-300 ease-out
-          lg:sticky lg:top-24 lg:translate-y-0 lg:static
+          lg:sticky lg:top-24 lg:translate-y-0
           ${showMobileFilters ? 'translate-y-0' : 'translate-y-full'}
         `}>
           <div className="h-full flex flex-col lg:block">

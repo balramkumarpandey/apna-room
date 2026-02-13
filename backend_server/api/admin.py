@@ -11,7 +11,7 @@ class RoomImageInline(admin.TabularInline):
     extra = 1
 
 class RoomAdmin(admin.ModelAdmin):
-    list_display = ('title', 'colony_name', 'price', 'broker_name', 'broker_phone', 'landlord_name', 'landlord_phone', 'is_available', 'google_map_link', 'total_inventory' )
+    list_display = ('title', 'colony_name', 'price', 'landlord_name', 'landlord_phone', 'is_available', 'google_map_link', 'total_inventory' )
     search_fields = ('title', 'colony_name', 'landlord_name')
     list_editable = ('total_inventory', 'is_available')
     list_filter = ('is_available', 'room_type')
@@ -20,7 +20,8 @@ class RoomAdmin(admin.ModelAdmin):
 # Custom Tenant Inquiry Admin
 class TenantInquiryAdmin(admin.ModelAdmin):
     # Update list_display to use the NEW link function
-    list_display = ('name', 'phone_number', 'get_room_link', 'get_broker_name', 'get_broker_phone')
+    list_display = ('name', 'phone_number', 'get_room_link', 'is_connected', 'created_at')
+    list_editable = ('is_connected',)
     
     search_fields = ('name', 'phone_number', 'room__title', 'room__landlord_name')
 

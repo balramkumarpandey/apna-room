@@ -88,6 +88,7 @@ class TenantInquiry(models.Model):
     payment_screenshot = models.ImageField(upload_to='payment_proofs/', blank=True, null=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
+    is_connected = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Inquiry by {self.name} for {self.room.title}"

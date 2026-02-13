@@ -102,7 +102,7 @@ const RoomCard = ({ room }) => {
         
         <div className="flex items-start gap-2 text-gray-500 text-sm mb-6">
           <MapPin size={16} className="mt-1 text-gray-400 shrink-0" />
-          <span className="line-clamp-2 leading-relaxed">{room.address}, {room.colony_name}</span>
+          <span className="line-clamp-2 leading-relaxed">{room.colony_name}</span>
         </div>
 
         {/* Bottom Action */}
