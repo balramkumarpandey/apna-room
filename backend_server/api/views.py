@@ -15,7 +15,7 @@ class RoomViewSet(viewsets.ModelViewSet):
     search_fields = [
         'title', 
         'description', 
-        'colony_name__name', 
+        'colony_name', 
         'address', 
         'price',
         'room_type',
