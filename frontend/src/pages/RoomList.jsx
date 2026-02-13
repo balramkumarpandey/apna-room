@@ -137,117 +137,129 @@ const RoomList = () => {
 
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 flex gap-10 relative">
         
-        {/* --- FIXED SIDEBAR FILTERS --- */}
+        {/* --- FIXED FILTER BOX (Updated to Bottom Sheet) --- */}
         <aside className={`
-          fixed lg:sticky lg:top-24 left-0 
-          w-80 bg-white lg:bg-transparent z-40 lg:z-0
-          transform transition-transform duration-300 ease-in-out lg:translate-x-0 
-          shadow-2xl lg:shadow-none p-0
-          h-[100dvh] lg:h-auto /* Fix for mobile height cropping */
-          ${showMobileFilters ? 'translate-x-0' : '-translate-x-full'}
+          fixed inset-x-0 bottom-0 z-50 
+          w-full h-[85vh] lg:h-auto lg:w-80 
+          bg-white lg:bg-transparent 
+          rounded-t-[2.5rem] lg:rounded-none
+          shadow-[0_-10px_40px_rgba(0,0,0,0.15)] lg:shadow-none
+          transform transition-transform duration-300 ease-out
+          lg:sticky lg:top-24 lg:translate-y-0 lg:static
+          ${showMobileFilters ? 'translate-y-0' : 'translate-y-full'}
         `}>
-          <div className="bg-white lg:bg-white lg:p-7 lg:rounded-[2rem] lg:shadow-[0_8px_30px_rgb(0,0,0,0.04)] lg:border lg:border-white/50 h-full overflow-y-auto lg:h-auto p-6 pb-24 lg:pb-6">
+          <div className="h-full flex flex-col lg:block">
             
-            <div className="flex items-center justify-between mb-8 lg:hidden">
-              <h2 className="text-2xl font-black text-slate-800 tracking-tight">Filter Rooms</h2>
-              <button onClick={() => setShowMobileFilters(false)} className="p-2 bg-slate-100 rounded-full"><X size={20} /></button>
+            {/* Mobile Drag Handle */}
+            <div className="lg:hidden flex justify-center pt-3 pb-1" onClick={() => setShowMobileFilters(false)}>
+                <div className="w-12 h-1.5 bg-slate-200 rounded-full"></div>
             </div>
 
-            {/* Location Dropdown */}
-            <div className="mb-8">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Quick Location</label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <div className="flex-1 overflow-y-auto p-6 lg:p-7 lg:rounded-[2rem] lg:bg-white lg:border lg:border-white/50 lg:shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                <div className="flex items-center justify-between mb-8 lg:hidden">
+                    <h2 className="text-2xl font-black text-slate-800 tracking-tight">Filters</h2>
+                    <button onClick={() => setShowMobileFilters(false)} className="p-2 bg-slate-100 rounded-full">
+                        <X size={20} />
+                    </button>
+                </div>
+
+                {/* Location Dropdown */}
+                <div className="mb-8">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Quick Location</label>
+                <div className="relative">
+                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                    <select 
+                    className="w-full pl-10 pr-10 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 focus:bg-white transition-all font-bold text-slate-700 appearance-none cursor-pointer"
+                    value={filters.colony_name}
+                    onChange={(e) => setFilters(prev => ({ ...prev, colony_name: e.target.value }))}
+                    >
+                    <option value="">All Areas</option>
+                    {colonies.map((colony) => (
+                        <option key={colony.id} value={colony.name}>{colony.name}</option>
+                    ))}
+                    </select>
+                </div>
+                </div>
+
+                {/* Tenant Type Filters */}
+                <div className="mb-8">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Who's moving in?</label>
+                <div className="grid grid-cols-2 gap-2">
+                    {tenantTypes.map((type) => (
+                    <button
+                        key={type.id}
+                        onClick={() => setFilters(prev => ({ ...prev, tenant_type: type.id }))}
+                        className={`
+                        px-3 py-2.5 rounded-xl text-xs font-black transition-all duration-200 border-2
+                        ${filters.tenant_type === type.id 
+                            ? 'bg-slate-900 text-white border-slate-900 shadow-xl scale-[1.02]' 
+                            : 'bg-white text-slate-500 border-slate-100 hover:border-blue-200 hover:bg-blue-50'
+                        }
+                        `}
+                    >
+                        {type.label}
+                    </button>
+                    ))}
+                </div>
+                </div>
+
+                {/* Room Type Filters */}
+                <div className="mb-8">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Preferred Layout</label>
+                <div className="grid grid-cols-1 gap-2">
+                    {roomTypes.map((type) => (
+                    <button
+                        key={type.id}
+                        onClick={() => setFilters(prev => ({ ...prev, room_type: type.id }))}
+                        className={`
+                        px-4 py-2.5 rounded-xl text-xs font-bold text-left transition-all duration-200 border-2 flex justify-between items-center
+                        ${filters.room_type === type.id 
+                            ? 'bg-blue-600 text-white border-blue-600' 
+                            : 'bg-white text-slate-600 border-slate-100 hover:bg-slate-50'
+                        }
+                        `}
+                    >
+                        {type.label}
+                        {filters.room_type === type.id && <Info size={14} />}
+                    </button>
+                    ))}
+                </div>
+                </div>
+
+                {/* Sort Dropdown */}
+                <div className="mb-4">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Sort Options</label>
                 <select 
-                  className="w-full pl-10 pr-10 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 focus:bg-white transition-all font-bold text-slate-700 appearance-none cursor-pointer"
-                  value={filters.colony_name}
-                  onChange={(e) => setFilters(prev => ({ ...prev, colony_name: e.target.value }))}
+                    className="w-full p-3 bg-slate-50 rounded-xl border-2 border-slate-100 focus:ring-4 focus:ring-blue-100 font-bold text-slate-700 cursor-pointer transition-all"
+                    value={filters.ordering}
+                    onChange={(e) => setFilters(prev => ({ ...prev, ordering: e.target.value }))}
                 >
-                  <option value="">All Areas</option>
-                  {colonies.map((colony) => (
-                    <option key={colony.id} value={colony.name}>{colony.name}</option>
-                  ))}
+                    <option value="">Newest Listings</option>
+                    <option value="price">Price: Low to High</option>
+                    <option value="-price">Price: High to Low</option>
                 </select>
-              </div>
+                </div>
+                
+                <button 
+                    onClick={() => {
+                        setFilters({ colony_name: '', room_type: '', tenant_type: '', ordering: '' });
+                        setSearchTerm('');
+                    }}
+                    className="w-full py-3 text-xs font-black text-slate-400 hover:text-red-500 transition-colors uppercase tracking-widest mb-4"
+                >
+                    Clear All Filters
+                </button>
             </div>
 
-            {/* Tenant Type Filters */}
-            <div className="mb-8">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Who's moving in?</label>
-              <div className="grid grid-cols-2 gap-2">
-                {tenantTypes.map((type) => (
-                  <button
-                    key={type.id}
-                    onClick={() => setFilters(prev => ({ ...prev, tenant_type: type.id }))}
-                    className={`
-                      px-3 py-2.5 rounded-xl text-xs font-black transition-all duration-200 border-2
-                      ${filters.tenant_type === type.id 
-                        ? 'bg-slate-900 text-white border-slate-900 shadow-xl scale-[1.02]' 
-                        : 'bg-white text-slate-500 border-slate-100 hover:border-blue-200 hover:bg-blue-50'
-                      }
-                    `}
-                  >
-                    {type.label}
-                  </button>
-                ))}
-              </div>
+            {/* Mobile Only: Show Results Button (Sticky at Bottom of Sheet) */}
+            <div className="lg:hidden p-4 border-t bg-white">
+                <button 
+                    onClick={() => setShowMobileFilters(false)}
+                    className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black shadow-lg shadow-blue-500/30"
+                >
+                    Show {rooms.length} Results
+                </button>
             </div>
-
-            {/* Room Type Filters */}
-            <div className="mb-8">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Preferred Layout</label>
-              <div className="grid grid-cols-1 gap-2">
-                {roomTypes.map((type) => (
-                  <button
-                    key={type.id}
-                    onClick={() => setFilters(prev => ({ ...prev, room_type: type.id }))}
-                    className={`
-                      px-4 py-2.5 rounded-xl text-xs font-bold text-left transition-all duration-200 border-2 flex justify-between items-center
-                      ${filters.room_type === type.id 
-                        ? 'bg-blue-600 text-white border-blue-600' 
-                        : 'bg-white text-slate-600 border-slate-100 hover:bg-slate-50'
-                      }
-                    `}
-                  >
-                    {type.label}
-                    {filters.room_type === type.id && <Info size={14} />}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Sort Dropdown */}
-            <div className="mb-4">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Sort Options</label>
-              <select 
-                className="w-full p-3 bg-slate-50 rounded-xl border-2 border-slate-100 focus:ring-4 focus:ring-blue-100 font-bold text-slate-700 cursor-pointer transition-all"
-                value={filters.ordering}
-                onChange={(e) => setFilters(prev => ({ ...prev, ordering: e.target.value }))}
-              >
-                <option value="">Newest Listings</option>
-                <option value="price">Price: Low to High</option>
-                <option value="-price">Price: High to Low</option>
-              </select>
-            </div>
-            
-            <button 
-                onClick={() => {
-                    setFilters({ colony_name: '', room_type: '', tenant_type: '', ordering: '' });
-                    setSearchTerm('');
-                }}
-                className="w-full py-3 text-xs font-black text-slate-400 hover:text-red-500 transition-colors uppercase tracking-widest mb-4"
-            >
-                Clear All Filters
-            </button>
-
-            {/* Mobile Only: Show Results Button */}
-            <button 
-                onClick={() => setShowMobileFilters(false)}
-                className="lg:hidden w-full py-4 bg-blue-600 text-white rounded-2xl font-black shadow-lg shadow-blue-500/30 sticky bottom-0"
-            >
-                Show {rooms.length} Results
-            </button>
-
           </div>
         </aside>
 
@@ -259,7 +271,7 @@ const RoomList = () => {
             </p>
             <button 
                 onClick={() => setShowMobileFilters(true)}
-                className="lg:hidden flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-full text-xs font-bold"
+                className="lg:hidden flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-full text-xs font-bold shadow-lg shadow-slate-900/20"
             >
                 <SlidersHorizontal size={14} /> Filter
             </button>
@@ -313,7 +325,7 @@ const RoomList = () => {
         <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-slate-900/60 z-[35] lg:hidden backdrop-blur-md"
+            className="fixed inset-0 bg-slate-900/60 z-[40] lg:hidden backdrop-blur-sm"
             onClick={() => setShowMobileFilters(false)}
         />
       )}
