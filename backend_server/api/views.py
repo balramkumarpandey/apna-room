@@ -12,7 +12,15 @@ class RoomViewSet(viewsets.ModelViewSet):
     serializer_class = RoomSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['room_type', 'is_available', 'colony_name', 'tenant_type']
-    search_fields = ['colony_name', 'title', 'address']
+    search_fields = [
+        'title', 
+        'description', 
+        'colony_name__name', 
+        'address', 
+        'price',
+        'room_type',
+        'tenant_type'
+    ]
     ordering_fields = ['price', 'created_at']
 
 # --- OPTIMIZED VIEWS WITH BACKGROUND EMAIL ---
