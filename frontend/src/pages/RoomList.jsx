@@ -11,7 +11,7 @@ const RoomList = () => {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [colonies, setColonies] = useState([]);
   
-  // New: Global Search Term
+  // Global Search Term
   const [searchTerm, setSearchTerm] = useState('');
 
   const [filters, setFilters] = useState({
@@ -36,6 +36,7 @@ const RoomList = () => {
     { id: 'FAMILY', label: 'Family' },
   ];
 
+  // Fetch Colony List
   useEffect(() => {
     const fetchColonies = async () => {
       try {
@@ -48,6 +49,7 @@ const RoomList = () => {
     fetchColonies();
   }, []);
 
+  // Fetch Rooms with Debounce
   useEffect(() => {
     const fetchRooms = async () => {
       setLoading(true);
@@ -70,14 +72,18 @@ const RoomList = () => {
       }
     };
 
-    const timeoutId = setTimeout(() => fetchRooms(), 400); // Debounce
+    // Debounce logic to prevent too many API calls while typing
+    const timeoutId = setTimeout(() => {
+        fetchRooms();
+    }, 500);
+
     return () => clearTimeout(timeoutId);
   }, [filters, searchTerm]);
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans selection:bg-blue-100">
       
-      {/* --- UNIQUE HERO SEARCH SECTION --- */}
+      {/* --- HERO SEARCH SECTION --- */}
       <div className="bg-white border-b pt-10 pb-12 px-4">
         <div className="max-w-4xl mx-auto text-center space-y-6">
             <motion.div 
@@ -131,13 +137,17 @@ const RoomList = () => {
 
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 flex gap-10 relative">
         
-        {/* Sidebar Filters */}
+        {/* --- FIXED SIDEBAR FILTERS --- */}
         <aside className={`
-          fixed lg:sticky lg:top-24 left-0 h-screen lg:h-auto w-80 bg-white lg:bg-transparent z-40 lg:z-0
-          transform transition-transform duration-300 ease-in-out lg:translate-x-0 shadow-2xl lg:shadow-none p-6 lg:p-0
+          fixed lg:sticky lg:top-24 left-0 
+          w-80 bg-white lg:bg-transparent z-40 lg:z-0
+          transform transition-transform duration-300 ease-in-out lg:translate-x-0 
+          shadow-2xl lg:shadow-none p-0
+          h-[100dvh] lg:h-auto /* Fix for mobile height cropping */
           ${showMobileFilters ? 'translate-x-0' : '-translate-x-full'}
         `}>
-          <div className="lg:bg-white lg:p-7 lg:rounded-[2rem] lg:shadow-[0_8px_30px_rgb(0,0,0,0.04)] lg:border lg:border-white/50 h-full overflow-y-auto lg:h-auto">
+          <div className="bg-white lg:bg-white lg:p-7 lg:rounded-[2rem] lg:shadow-[0_8px_30px_rgb(0,0,0,0.04)] lg:border lg:border-white/50 h-full overflow-y-auto lg:h-auto p-6 pb-24 lg:pb-6">
+            
             <div className="flex items-center justify-between mb-8 lg:hidden">
               <h2 className="text-2xl font-black text-slate-800 tracking-tight">Filter Rooms</h2>
               <button onClick={() => setShowMobileFilters(false)} className="p-2 bg-slate-100 rounded-full"><X size={20} /></button>
@@ -225,10 +235,19 @@ const RoomList = () => {
                     setFilters({ colony_name: '', room_type: '', tenant_type: '', ordering: '' });
                     setSearchTerm('');
                 }}
-                className="w-full py-3 text-xs font-black text-slate-400 hover:text-red-500 transition-colors uppercase tracking-widest"
+                className="w-full py-3 text-xs font-black text-slate-400 hover:text-red-500 transition-colors uppercase tracking-widest mb-4"
             >
                 Clear All Filters
             </button>
+
+            {/* Mobile Only: Show Results Button */}
+            <button 
+                onClick={() => setShowMobileFilters(false)}
+                className="lg:hidden w-full py-4 bg-blue-600 text-white rounded-2xl font-black shadow-lg shadow-blue-500/30 sticky bottom-0"
+            >
+                Show {rooms.length} Results
+            </button>
+
           </div>
         </aside>
 
