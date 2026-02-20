@@ -291,23 +291,16 @@ const RoomDetail = () => {
             </motion.div>
           )}
 
-          {/* Description & Distance Widget */}
+          {/* Distance Widget & Description */}
           <div className="pt-6 border-t border-slate-200">
-            <h3 className="text-xl font-bold text-slate-900 mb-4">
-              About this place
-            </h3>
-            <p className="text-slate-600 leading-relaxed text-base lg:text-lg">
-              {room.description || "No description provided."}
-            </p>
-
-            {/* NEW: Distance Connecting Line Widget */}
+            {/* Distance Connecting Line Widget (Moved BEFORE Description) */}
             {room.place_name && room.distance_km && (
-              <div className="mt-8 bg-slate-50 p-5 rounded-2xl border border-slate-200 max-w-sm shadow-sm">
+              <div className="mb-8 bg-slate-50 p-5 rounded-2xl border border-slate-200 max-w-sm shadow-sm">
                 <h4 className="font-bold text-slate-800 mb-4 text-md">
                   Distance from Landmark
                 </h4>
                 <div className="relative pl-2">
-                  {/* Point A: Landmark */}
+                  {/* Landmark */}
                   <div className="flex items-start gap-4 relative">
                     <div className="flex flex-col items-center">
                       <div className="w-4 h-4 rounded-full border-4 border-blue-500 bg-white z-10"></div>
@@ -323,7 +316,7 @@ const RoomDetail = () => {
                     </div>
                   </div>
 
-                  {/* Point B: Room Location */}
+                  {/* Room Location */}
                   <div className="flex items-start gap-4 relative">
                     <div className="flex flex-col items-center">
                       <div className="w-4 h-4 rounded-full border-4 border-green-500 bg-white z-10"></div>
@@ -341,16 +334,13 @@ const RoomDetail = () => {
               </div>
             )}
 
-            {/* Existing Location Details */}
-            <div className="mt-6 bg-slate-100 p-5 rounded-2xl border border-slate-200">
-              <h4 className="font-bold text-slate-700 mb-2 flex items-center gap-2">
-                <MapPin size={18} /> Location Details
-              </h4>
-              <p className="text-slate-500 text-sm">
-                Located in {room.colony_name}. The exact house address will be
-                shared after booking a visit.
-              </p>
-            </div>
+            {/* About this place */}
+            <h3 className="text-xl font-bold text-slate-900 mb-4">
+              About this place
+            </h3>
+            <p className="text-slate-600 leading-relaxed text-base lg:text-lg">
+              {room.description || "No description provided."}
+            </p>
           </div>
         </div>
 
