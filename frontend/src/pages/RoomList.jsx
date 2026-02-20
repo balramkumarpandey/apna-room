@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import api from '../api';
 import { motion, AnimatePresence } from 'framer-motion';
 import RoomCard from '../components/RoomCard';
@@ -11,8 +11,9 @@ const RoomList = () => {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [colonies, setColonies] = useState([]);
   
-  // Global Search Term
-  const [searchTerm, setSearchTerm] = useState('');
+  // Separate Input State from Search Query
+  const [inputText, setInputText] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
 
   const [filters, setFilters] = useState({
     colony_name: '',
@@ -36,7 +37,7 @@ const RoomList = () => {
     { id: 'FAMILY', label: 'Family' },
   ];
 
-  // Fetch Colony List
+  // Fetch Colony List (Runs once)
   useEffect(() => {
     const fetchColonies = async () => {
       try {
@@ -49,15 +50,22 @@ const RoomList = () => {
     fetchColonies();
   }, []);
 
-  // Fetch Rooms with Debounce
+  // Fast Debounce for Typing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(inputText);
+    }, 400); // Wait 400ms after user stops typing
+    return () => clearTimeout(timer);
+  }, [inputText]);
+
+  // Fetch Rooms
   useEffect(() => {
     const fetchRooms = async () => {
       setLoading(true);
       try {
         const params = new URLSearchParams();
         
-        // Combine Global Search with Filters
-        if (searchTerm) params.append('search', searchTerm);
+        if (debouncedQuery) params.append('search', debouncedQuery);
         if (filters.colony_name) params.append('colony_name', filters.colony_name);
         if (filters.room_type) params.append('room_type', filters.room_type);
         if (filters.tenant_type) params.append('tenant_type', filters.tenant_type);
@@ -72,13 +80,31 @@ const RoomList = () => {
       }
     };
 
-    // Debounce logic to prevent too many API calls while typing
-    const timeoutId = setTimeout(() => {
-        fetchRooms();
-    }, 500);
+    fetchRooms();
+  }, [filters, debouncedQuery]);
 
-    return () => clearTimeout(timeoutId);
-  }, [filters, searchTerm]);
+  //  Memoize the rendered list
+  const renderedRooms = useMemo(() => {
+    return rooms.map((room) => (
+      <motion.div
+        key={room.id}
+        layout
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        transition={{ duration: 0.3 }}
+      >
+        <RoomCard room={room} />
+      </motion.div>
+    ));
+  }, [rooms]);
+
+  // Prevents the clear button from re-rendering unnecessarily
+  const handleClearFilters = useCallback(() => {
+    setFilters({ colony_name: '', room_type: '', tenant_type: '', ordering: '' });
+    setInputText('');
+    setDebouncedQuery('');
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans selection:bg-blue-100">
@@ -106,38 +132,25 @@ const RoomList = () => {
                 <input 
                     type="text"
                     placeholder="Search by colony, title, rent, or 'Boys/Girls'..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
                     className="w-full pl-14 pr-16 py-5 bg-slate-100 border-2 border-transparent rounded-[2rem] text-lg font-medium focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all shadow-lg shadow-slate-200/50 outline-none placeholder:text-slate-400"
                 />
-                {searchTerm && (
+                {inputText && (
                     <button 
-                        onClick={() => setSearchTerm('')}
+                        onClick={() => { setInputText(''); setDebouncedQuery(''); }}
                         className="absolute inset-y-0 right-5 flex items-center text-slate-400 hover:text-slate-600"
                     >
                         <X size={20} className="bg-slate-200 rounded-full p-0.5" />
                     </button>
                 )}
             </div>
-            
-            <div className="flex flex-wrap justify-center gap-4 pt-2">
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Trending:</p>
-                {['Vikas Colony', 'Single Room', 'Girls Only', 'Under 5000'].map((tag) => (
-                    <button 
-                        key={tag}
-                        onClick={() => setSearchTerm(tag)}
-                        className="text-xs font-bold text-slate-500 hover:text-blue-600 transition-colors"
-                    >
-                        #{tag.replace(' ', '')}
-                    </button>
-                ))}
-            </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 flex gap-10 relative">
         
-        {/* --- FIXED FILTER BOX --- */}
+        {/* --- FILTER BOX --- */}
         <aside className={`
           fixed inset-x-0 bottom-0 z-50 
           w-full h-[85vh] lg:h-auto lg:w-80 
@@ -241,17 +254,14 @@ const RoomList = () => {
                 </div>
                 
                 <button 
-                    onClick={() => {
-                        setFilters({ colony_name: '', room_type: '', tenant_type: '', ordering: '' });
-                        setSearchTerm('');
-                    }}
+                    onClick={handleClearFilters}
                     className="w-full py-3 text-xs font-black text-slate-400 hover:text-red-500 transition-colors uppercase tracking-widest mb-4"
                 >
                     Clear All Filters
                 </button>
             </div>
 
-            {/* Mobile Only: Show Results Button (Sticky at Bottom of Sheet) */}
+            {/* Mobile Only: Show Results Button */}
             <div className="lg:hidden p-4 border-t bg-white">
                 <button 
                     onClick={() => setShowMobileFilters(false)}
@@ -293,7 +303,7 @@ const RoomList = () => {
               <h3 className="text-2xl font-black text-slate-800 mb-2 tracking-tight">No rooms match your search</h3>
               <p className="text-slate-500 max-w-xs mx-auto mb-8 font-medium">Try searching for something else like "Vikas Colony" or "Boys".</p>
               <button 
-                onClick={() => {setFilters({ colony_name: '', room_type: '', tenant_type: '', ordering: '' }); setSearchTerm('');}}
+                onClick={handleClearFilters}
                 className="px-8 py-3 bg-blue-600 text-white rounded-full font-black text-sm shadow-xl shadow-blue-500/20 active:scale-95 transition-all"
               >
                 Clear Search
@@ -302,18 +312,7 @@ const RoomList = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
               <AnimatePresence mode='popLayout'>
-                {rooms.map((room) => (
-                  <motion.div
-                    key={room.id}
-                    layout
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <RoomCard room={room} />
-                  </motion.div>
-                ))}
+                {renderedRooms}
               </AnimatePresence>
             </div>
           )}
