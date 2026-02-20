@@ -46,6 +46,12 @@ class Room(models.Model):
     google_map_link = models.URLField(blank=True, null=True, help_text="Google Maps link here")
     total_inventory = models.IntegerField(default=1, help_text="How many sets of this room are available?")
     
+    # places like School, college, or any work place
+    place_name = models.CharField(max_length=150, null=True, blank=True)
+
+    # stores the distance in Kilometers
+    distance_km = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True)
+    
     broker_name = models.CharField(max_length=100, default="Office", help_text="Name of the Broker")
     broker_phone = models.CharField(max_length=15, default="", blank=True, help_text="Phone number of Broker (Leave empty if none)")
 

@@ -17,8 +17,12 @@ class RoomSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Room
-        fields = ['id', 'title', 'price', 'description', 'address', 'colony_name', 'images', 'video', 'room_type', 'is_available', 'tenant_type']
-
+        fields = [
+        'id', 'title', 'price', 'description', 'address', 
+        'colony_name', 'images', 'video', 'room_type', 
+        'is_available', 'tenant_type', 
+        'place_name', 'distance_km'
+    ]
 class TenantInquirySerializer(serializers.ModelSerializer):
     class Meta:
         model = TenantInquiry
