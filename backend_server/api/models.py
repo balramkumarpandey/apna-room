@@ -47,7 +47,7 @@ class Room(models.Model):
     total_inventory = models.IntegerField(default=1, help_text="How many sets of this room are available?")
     
     # places like School, college, or any work place
-    place_name = models.CharField(max_length=150, null=True, blank=True)
+    place_name = models.CharField(max_length=150, null=True, blank=True, help_text="places like School, college, or any work place")
 
     # stores the distance in Kilometers
     distance_km = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True)
