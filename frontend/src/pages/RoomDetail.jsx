@@ -293,7 +293,7 @@ const RoomDetail = () => {
 
           {/* Distance Widget & Description */}
           <div className="pt-6 border-t border-slate-200">
-            {/* Distance Connecting Line Widget (Moved BEFORE Description) */}
+            {/* Distance Connecting Line Widget */}
             {room.place_name && room.distance_km && (
               <div className="mb-8 bg-slate-50 p-5 rounded-2xl border border-slate-200 max-w-sm shadow-sm">
                 <h4 className="font-bold text-slate-800 mb-4 text-md">
