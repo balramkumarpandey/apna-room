@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search, Home, Key, CheckCircle, Heart, Coffee } from 'lucide-react'; // Added Heart & Coffee for warmth
+import { Search, Key, CheckCircle, Heart, Coffee } from 'lucide-react';
 
 import LandlordModal from '../components/LandlordModal';
+import logoImage from '../assets/apnaroom-logo.png';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -31,15 +32,26 @@ const LandingPage = () => {
       <div className="absolute top-0 right-0 w-96 h-96 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
 
       {/* Navbar */}
-      <nav className="relative z-10 flex justify-between items-center p-6 md:px-12">
-        <div className="text-2xl font-bold tracking-tight flex items-center gap-2">
-          {/* Changed Icon to Home with Heart for emotion */}
-          <div className="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
-            <Home className="w-6 h-6 text-blue-300 fill-blue-300/20" />
-          </div>
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-white">
-            ApnaRoom
-          </span>
+      <nav className="relative z-10 flex justify-center md:justify-start items-center p-6 md:px-12 w-full">
+        <div className="flex items-center">
+          
+          <img 
+            src={logoImage} 
+            alt="ApnaRoom Logo" 
+            className="
+              w-auto object-contain
+              
+              /* Mobile (Default): Centered, slightly bigger height, scaling from the top center */
+              origin-top h-28 scale-[1.75] -translate-y-8 translate-x-0
+              
+              /* Tablet (sm): Keeping your perfect size, centered */
+              sm:h-32 sm:scale-[1.75] sm:-translate-y-10 sm:translate-x-0
+              
+              /* Desktop (md): Shifts back to the top-left corner, scales up, and pulls left to hide whitespace */
+              md:origin-top-left md:h-40 md:scale-[2] md:-translate-y-14 md:-translate-x-40
+            " 
+          />
+          
         </div>
       </nav>
 
