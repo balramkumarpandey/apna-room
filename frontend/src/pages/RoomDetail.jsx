@@ -6,13 +6,9 @@ import {
   MapPin,
   ArrowLeft,
   PlayCircle,
-  Phone,
   Users,
-  CreditCard,
   Share2,
   ShieldCheck,
-  User,
-  HelpCircle,
 } from "lucide-react";
 import TenantModal from "../components/TenantModal";
 import BookingModal from "../components/BookingModal";
@@ -66,20 +62,17 @@ const RoomDetail = () => {
   if (!room)
     return <div className="text-center py-20 bg-slate-50">Room not found</div>;
 
-  // --- SHARE FUNCTION ---
   const handleShare = async () => {
     const shareData = {
       title: room.title,
       text: `Check out this room in ${room.colony_name} on ApnaRoom!`,
-      url: window.location.href, // Gets the current page URL
+      url: window.location.href,
     };
 
     try {
-      //  Try Native Share (Mobile/Tablets)
       if (navigator.share) {
         await navigator.share(shareData);
       } else {
-        // Fallback for Desktop: Copy to Clipboard
         await navigator.clipboard.writeText(window.location.href);
         alert("Link copied to clipboard! 📋");
       }
@@ -89,9 +82,8 @@ const RoomDetail = () => {
   };
 
   const tenantBadge = getTenantBadge(room.tenant_type);
-  const bookingAmount = room.price / 4;
 
-  // --- REUSABLE TRUST BADGE COMPONENT ---
+  // TRUST BADGE ---
   const TrustBadge = () => (
     <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex gap-3 shadow-sm mt-4">
       <div className="bg-white p-1.5 rounded-full border border-green-100 shadow-sm h-fit shrink-0">
@@ -99,62 +91,30 @@ const RoomDetail = () => {
       </div>
       <div>
         <h4 className="text-green-800 font-bold text-xs uppercase tracking-wide mb-1">
-          100% Money Safe Guarantee
+          100% Refund Guarantee
         </h4>
         <p className="text-green-700 text-xs leading-relaxed">
-          Your payment is held in <strong>Escrow</strong>. We only release it to
-          the landlord <strong>after</strong> you confirm your move-in.
+          Your ₹99 booking fee is completely safe. If you visit and don't like the room, we will <strong>instantly refund</strong> your money, no questions asked.
         </p>
       </div>
     </div>
   );
 
-  // --- RENT BREAKDOWN CARD ---
-  const RentBreakdown = () => (
+  // ---VISIT BOOKING CARD---
+  const VisitBookingCard = () => (
     <div className="bg-emerald-50/80 border border-emerald-100 rounded-xl p-4 mt-4">
       <div className="flex items-start gap-3">
-        <ShieldCheck className="text-emerald-600 shrink-0 mt-0.5" size={20} />
+        <MapPin className="text-emerald-600 shrink-0 mt-0.5" size={20} />
         <div>
           <h4 className="font-bold text-emerald-900 text-sm">
-            No Brokerage / Zero Commission
+            Unlock Location & Visit
           </h4>
           <p className="text-xs text-emerald-700 mt-1 leading-relaxed">
-            The <strong>₹{bookingAmount.toLocaleString()}</strong> you pay now
-            is{" "}
-            <span className="underline">
-              strictly part of your 1st month rent
-            </span>
-            .
+            Pay a small refundable token to instantly get the exact room location and schedule a direct visit with the owner.
           </p>
-          <div className="mt-3 text-xs text-emerald-600 flex flex-col gap-2">
-            {/* --- TOOLTIP ADDED HERE --- */}
-            <div className="flex justify-between items-center relative z-10">
-              <span className="flex items-center gap-1.5 cursor-help group">
-                Pay Now to Book (25%)
-                <HelpCircle
-                  size={14}
-                  className="text-emerald-400 group-hover:text-emerald-600 transition-colors"
-                />
-                {/* The Tooltip Popup */}
-                <div className="absolute bottom-full left-0 mb-2 w-48 bg-slate-800 text-white text-[10px] p-2.5 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none transform translate-y-2 group-hover:translate-y-0 z-50">
-                  <p className="leading-relaxed">
-                    <strong>Risk-Free:</strong> If you visit and don't like the
-                    room, we will find you another one or refund your money.
-                  </p>
-                  {/* Little arrow pointing down */}
-                  <div className="absolute top-full left-4 border-4 border-transparent border-t-slate-800"></div>
-                </div>
-              </span>
-              <span className="font-bold text-emerald-700">
-                ₹{bookingAmount.toLocaleString()}
-              </span>
-            </div>
-            {/* ---------------------------------- */}
-
-            <div className="flex justify-between border-t border-emerald-200/60 pt-2">
-              <span>Pay Landlord on Move-in:</span>
-              <span className="font-bold">Remaining 75%</span>
-            </div>
+          <div className="mt-3 text-sm text-emerald-800 flex justify-between items-center border-t border-emerald-200/60 pt-2 font-bold">
+            <span>Visit Booking Fee:</span>
+            <span className="text-base text-emerald-600">₹99</span>
           </div>
         </div>
       </div>
@@ -184,9 +144,8 @@ const RoomDetail = () => {
       </div>
 
       <main className="max-w-7xl mx-auto px-4 lg:px-8 py-6 lg:py-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-        {/* LEFT COLUMN (Visuals & Mobile Info) */}
+        {/* LEFT COLUMN */}
         <div className="lg:col-span-8 space-y-6">
-          {/* Main Image */}
           <div className="bg-white p-2 rounded-3xl shadow-xl shadow-slate-200/50">
             <div className="bg-slate-100 w-full aspect-[3/4] lg:h-[600px] rounded-3xl overflow-hidden relative flex items-center justify-center group shadow-inner">
               <AnimatePresence mode="wait">
@@ -208,7 +167,6 @@ const RoomDetail = () => {
             </div>
           </div>
 
-          {/* Thumbnails */}
           {room.images.length > 1 && (
             <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide px-1">
               {room.images.map((img) => (
@@ -229,7 +187,7 @@ const RoomDetail = () => {
             </div>
           )}
 
-          {/* --- MOBILE INFO SECTION (lg:hidden) --- */}
+          {/* MOBILE INFO SECTION */}
           <div className="lg:hidden space-y-6">
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -251,7 +209,6 @@ const RoomDetail = () => {
               </div>
             </div>
 
-            {/* Price Card Mobile */}
             <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
               <p className="text-xs text-blue-400 font-bold uppercase tracking-wider mb-1">
                 Total Monthly Rent
@@ -259,16 +216,12 @@ const RoomDetail = () => {
               <div className="text-3xl font-extrabold text-blue-600">
                 ₹{room.price.toLocaleString()}
               </div>
-
-              {/* Mobile Rent Breakdown */}
-              <RentBreakdown />
-
-              {/* --- MOBILE TRUST BADGE PLACEMENT --- */}
+              
+              <VisitBookingCard />
               <TrustBadge />
             </div>
           </div>
 
-          {/* Video Section */}
           {room.video && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -285,22 +238,18 @@ const RoomDetail = () => {
                     src={getOptimizedUrl(room.video, 800)}
                     type="video/mp4"
                   />
-                  Your browser does not support the video tag.
                 </video>
               </div>
             </motion.div>
           )}
 
-          {/* Distance Widget & Description */}
           <div className="pt-6 border-t border-slate-200">
-            {/* Distance Connecting Line Widget */}
             {room.place_name && room.distance_km && (
               <div className="mb-8 bg-slate-50 p-5 rounded-2xl border border-slate-200 max-w-sm shadow-sm">
                 <h4 className="font-bold text-slate-800 mb-4 text-md">
                   Distance from Landmark
                 </h4>
                 <div className="relative pl-2">
-                  {/* Landmark */}
                   <div className="flex items-start gap-4 relative">
                     <div className="flex flex-col items-center">
                       <div className="w-4 h-4 rounded-full border-4 border-blue-500 bg-white z-10"></div>
@@ -315,8 +264,6 @@ const RoomDetail = () => {
                       </p>
                     </div>
                   </div>
-
-                  {/* Room Location */}
                   <div className="flex items-start gap-4 relative">
                     <div className="flex flex-col items-center">
                       <div className="w-4 h-4 rounded-full border-4 border-green-500 bg-white z-10"></div>
@@ -333,8 +280,6 @@ const RoomDetail = () => {
                 </div>
               </div>
             )}
-
-            {/* About this place */}
             <h3 className="text-xl font-bold text-slate-900 mb-4">
               About this place
             </h3>
@@ -344,7 +289,7 @@ const RoomDetail = () => {
           </div>
         </div>
 
-        {/* RIGHT COLUMN (Desktop Sticky Sidebar) */}
+        {/* RIGHT COLUMN (Desktop) */}
         <div className="hidden lg:block lg:col-span-4">
           <div className="sticky top-28">
             <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white p-8">
@@ -359,7 +304,6 @@ const RoomDetail = () => {
                     <Users size={12} /> {tenantBadge.label}
                   </span>
                 </div>
-
                 <h1 className="text-2xl font-bold text-slate-900 mb-2 leading-snug">
                   {room.title}
                 </h1>
@@ -381,9 +325,9 @@ const RoomDetail = () => {
                 </div>
               </div>
 
-              {/* Desktop Rent Breakdown */}
-              <RentBreakdown />
+              <VisitBookingCard />
 
+              {/* --- CONSOLIDATED BUTTON (Desktop) --- */}
               <div className="space-y-3 mt-6">
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -391,49 +335,27 @@ const RoomDetail = () => {
                   onClick={() => setIsBookingOpen(true)}
                   className="w-full py-4 bg-emerald-600 text-white rounded-xl font-bold text-lg hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 group"
                 >
-                  <CreditCard
+                  <MapPin
                     size={20}
-                    className="group-hover:rotate-12 transition-transform"
+                    className="group-hover:-translate-y-1 transition-transform"
                   />{" "}
-                  Pay 25% to Book
+                  Book & Visit for ₹99
                 </motion.button>
-
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setIsModalOpen(true)}
-                  className="w-full py-4 bg-white border-2 border-slate-200 text-slate-700 rounded-xl font-bold text-lg hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-2"
-                >
-                  <Phone size={20} /> Book a Visit
-                </motion.button>
-
-                {/* --- DESKTOP TRUST BADGE PLACEMENT --- */}
                 <TrustBadge />
               </div>
-
-              <p className="text-center text-xs text-slate-400 mt-4">
-                Free cancellation within 24 hours of booking.
-              </p>
             </div>
           </div>
         </div>
       </main>
 
-      {/* MOBILE BOTTOM ACTION BAR */}
-      <div className="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 p-4 lg:hidden z-40 flex items-center gap-3 pb-safe shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
-        <motion.button
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setIsModalOpen(true)}
-          className="flex-1 py-3 bg-slate-100 text-slate-700 rounded-xl font-bold border border-slate-200 flex items-center justify-center gap-2"
-        >
-          <Phone size={18} /> Visit
-        </motion.button>
+      {/* ---CONSOLIDATED BUTTON (Mobile) --- */}
+      <div className="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 p-4 lg:hidden z-40 flex pb-safe shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
         <motion.button
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsBookingOpen(true)}
-          className="flex-[2] py-3 bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"
+          className="w-full py-4 bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 text-lg"
         >
-          <CreditCard size={18} /> Book Now
+          <MapPin size={20} /> Book & Visit for ₹99
         </motion.button>
       </div>
 
