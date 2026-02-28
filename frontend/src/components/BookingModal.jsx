@@ -227,7 +227,7 @@ Please send me the exact location and landlord details!`;
                       </div>
                       
                       <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                        <label className="flex items-center gap-1 text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                           WhatsApp Number <MessageCircle size={14} className="text-emerald-500"/>
                         </label>
                         <input required type="tel" className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition font-medium"
