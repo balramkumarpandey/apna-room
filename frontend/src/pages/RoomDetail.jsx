@@ -10,7 +10,6 @@ import {
   Share2,
   ShieldCheck,
 } from "lucide-react";
-import TenantModal from "../components/TenantModal";
 import BookingModal from "../components/BookingModal";
 import { getOptimizedUrl } from "../utils/imageHelper";
 
@@ -359,11 +358,6 @@ const RoomDetail = () => {
         </motion.button>
       </div>
 
-      <TenantModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        room={room}
-      />
       <BookingModal
         isOpen={isBookingOpen}
         onClose={() => setIsBookingOpen(false)}
