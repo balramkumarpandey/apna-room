@@ -3,7 +3,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
-from api.views import RoomViewSet, TenantInquiryCreateView, LandlordInquiryCreateView, ColonyListView
+from api.views import RoomViewSet, TenantInquiryCreateView, LandlordInquiryCreateView, ColonyListView, whatsapp_webhook
 
 from django.urls import re_path
 from django.views.static import serve
@@ -20,6 +20,8 @@ urlpatterns = [
     path('api/inquire/tenant/', TenantInquiryCreateView.as_view(), name='tenant-inquiry'),
     path('api/inquire/landlord/', LandlordInquiryCreateView.as_view(), name='landlord-inquiry'),
     path('api/colonies/', ColonyListView.as_view(), name='colony-list'),
+
+    path('api/webhooks/whatsapp/', whatsapp_webhook, name='whatsapp_webhook'),
 ]
 
 if settings.DEBUG:

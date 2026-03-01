@@ -1,11 +1,15 @@
-import threading # <--- 1. Import threading
+import json
+import requests
+import threading
 from django.core.mail import EmailMessage
 from django.conf import settings
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import viewsets, generics, filters
 from django_filters.rest_framework import DjangoFilterBackend
+
 from .models import Room, TenantInquiry, LandlordInquiry, Colony
 from .serializers import RoomSerializer, TenantInquirySerializer, LandlordInquirySerializer, ColonySerializer
-
 
 class RoomViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.prefetch_related('images').all()
@@ -37,8 +41,8 @@ class TenantInquiryCreateView(generics.CreateAPIView):
         def send_email_task():
             try:
                 subject = f"New Inquiry: {instance.name}"
-                if "BOOKING:" in instance.name:
-                    subject = f"💰 PAYMENT RECEIVED: {instance.name}"
+                if "BOOKING:" in instance.name or "VISIT BOOKING:" in instance.name:
+                    subject = f"💰 ₹99 PAYMENT RECEIVED: {instance.name}"
                 
                 message = f"""
                 New Inquiry Received!
@@ -61,7 +65,6 @@ class TenantInquiryCreateView(generics.CreateAPIView):
                     if instance.payment_screenshot.name.endswith('.png'):
                         content_type = 'image/png'
                     
-                    # We must open the file again because the request is closed
                     instance.payment_screenshot.open()
                     email.attach(instance.payment_screenshot.name, instance.payment_screenshot.read(), content_type)
                     instance.payment_screenshot.close()
@@ -70,9 +73,8 @@ class TenantInquiryCreateView(generics.CreateAPIView):
             except Exception as e:
                 print(f"Background Email Error: {e}")
 
-        # 3. Start the Background Thread (Instant Response to User)
+        # Start the Background Thread
         threading.Thread(target=send_email_task).start()
-
 
 class LandlordInquiryCreateView(generics.CreateAPIView):
     queryset = LandlordInquiry.objects.all()
@@ -107,3 +109,114 @@ class LandlordInquiryCreateView(generics.CreateAPIView):
 class ColonyListView(generics.ListAPIView):
     queryset = Colony.objects.all()
     serializer_class = ColonySerializer
+
+
+META_VERIFY_TOKEN = "apnaroom_secure_token_2026"
+META_ACCESS_TOKEN = "EAAdW7w2yz5oBQ8VFAscsPsVos8YdB2HSVShGOg1Vyd8LuzsLbvhUGd8wtCkNpw0YFKOZAYUjc28f6qNm1ROS8WcJ2GuhAdZCllnF47FiINZC36u5JIjmIKhNgLmYCpqsw9rGN81izLeXKw6GiUfzl9wrSdZB17KPQqL6PM3sKBRSEaZCPWfBOf7890GJYOmduZBOQ7QmjbBXHhXgxPZBlZAUstOaPlqPdmM0ZAUu9omlNNqOKXHcYGDH5iubcVQ2gnmEMmSsZCnfPFIABhlS0xktAxrZAwvMYXbSI4kBoT0LwZDZD"
+META_PHONE_NUMBER_ID = "1061229450396582"
+ADMIN_NUMBER = "919548484981"
+
+@csrf_exempt
+def whatsapp_webhook(request):
+    #  META VERIFICATION (Required by Facebook to connect)
+    if request.method == "GET":
+        mode = request.GET.get("hub.mode")
+        token = request.GET.get("hub.verify_token")
+        challenge = request.GET.get("hub.challenge")
+
+        if mode == "subscribe" and token == META_VERIFY_TOKEN:
+            return HttpResponse(challenge, status=200)
+        return HttpResponse("Verification failed", status=403)
+
+    #  RECEIVE INCOMING MESSAGES
+    elif request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            
+            # Navigate Meta's JSON Structure
+            entry = data.get('entry', [])[0]
+            changes = entry.get('changes', [])[0]
+            value = changes.get('value', {})
+            
+            # CRITICAL CHECK: Only process actual messages, ignore "read/delivered" receipts
+            if 'messages' in value:
+                message = value['messages'][0]
+                
+                # Get sender phone and the text they typed
+                sender_phone = message.get('from')
+                text_received = message.get('text', {}).get('body', '').strip()
+
+                if not text_received:
+                    return HttpResponse("EVENT_RECEIVED", status=200)
+
+                # --- IF THE ADMIN (YOU) SENDS A MESSAGE ---
+                if sender_phone == ADMIN_NUMBER:
+                    if text_received.upper().startswith("APPROVE"):
+                        try:
+                            # You will type: "APPROVE 9876543210"
+                            tenant_phone = text_received.split(" ")[1]
+                            
+                            # Find the tenant's latest inquiry
+                            inquiry = TenantInquiry.objects.filter(phone_number__icontains=tenant_phone).order_by('-created_at').first()
+                            
+                            if inquiry:
+                                # Send details to tenant
+                                send_landlord_details_whatsapp(tenant_phone, inquiry.room)
+                                # Notify yourself
+                                send_simple_whatsapp(ADMIN_NUMBER, f"✅ Details sent successfully to {tenant_phone}")
+                            else:
+                                send_simple_whatsapp(ADMIN_NUMBER, f"❌ Could not find an inquiry for {tenant_phone}")
+                        
+                        except IndexError:
+                            # If you type just "APPROVE" without a number
+                            send_simple_whatsapp(ADMIN_NUMBER, "⚠️ Please format like this: APPROVE 9876543210")
+                        
+                        return HttpResponse("EVENT_RECEIVED", status=200)
+
+                # ---  IF A TENANT SENDS A MESSAGE ---
+                else:
+                    # Tell them to wait for verification
+                    send_simple_whatsapp(
+                        sender_phone, 
+                        "⏳ We have received your message! Please wait 2-5 minutes while our team verifies the ₹99 payment with the bank. You will receive the landlord details shortly."
+                    )
+
+        except Exception as e:
+            print(f"Webhook Error: {e}")
+
+        # Always return 200 OK so Meta doesn't keep resending the message
+        return HttpResponse("EVENT_RECEIVED", status=200)
+
+
+# --- WHATSAPP SENDER FUNCTIONS ---
+
+def send_simple_whatsapp(to_number, text):
+    """Utility to send simple text messages"""
+    url = f"https://graph.facebook.com/v18.0/{META_PHONE_NUMBER_ID}/messages"
+    headers = {"Authorization": f"Bearer {META_ACCESS_TOKEN}", "Content-Type": "application/json"}
+    payload = {"messaging_product": "whatsapp", "to": to_number, "type": "text", "text": {"body": text}}
+    requests.post(url, headers=headers, json=payload)
+
+def send_landlord_details_whatsapp(to_phone_number, room):
+    """Sends the landlord details to the tenant."""
+    url = f"https://graph.facebook.com/v18.0/{META_PHONE_NUMBER_ID}/messages"
+    headers = {"Authorization": f"Bearer {META_ACCESS_TOKEN}", "Content-Type": "application/json"}
+    
+    reply_text = f"""✅ *Payment Verified!*
+    
+Here are the details for your room visit in {room.colony_name}:
+
+👤 *Owner Name:* {room.landlord_name or 'Not Provided'}
+📞 *Contact Number:* {room.landlord_phone or 'Not Provided'}
+🏠 *Address:* {room.address}
+📍 *Google Maps:* {room.google_map_link or 'No link available'}
+
+_Please call the owner before visiting. Let them know ApnaRoom sent you!_"""
+
+    payload = {
+        "messaging_product": "whatsapp",
+        "to": to_phone_number,
+        "type": "text",
+        "text": {"body": reply_text}
+    }
+    requests.post(url, headers=headers, json=payload)

@@ -46,7 +46,7 @@ const BookingModal = ({ isOpen, onClose, room }) => {
     try {
       // 1. Send data and screenshot to your backend
       const data = new FormData();
-      data.append('name', `VISIT BOOKING: ${formData.name}`);
+      data.append('name', formData.name);
       data.append('phone_number', formData.phone_number);
       data.append('room', room.id);
       data.append('payment_screenshot', screenshot);
